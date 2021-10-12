@@ -1,8 +1,8 @@
-import Table from './table';
-import tableIcon from './img/tableIcon.svg';
-import withHeadings from './img/with-headings.svg';
-import withoutHeadings from './img/without-headings.svg';
-import * as $ from './utils/dom';
+import Table from "./table";
+import tableIcon from "./img/tableIcon.svg";
+import withHeadings from "./img/with-headings.svg";
+import withoutHeadings from "./img/without-headings.svg";
+import * as $ from "./utils/dom";
 
 /**
  * @typedef {object} TableConfig - configuration that the user can set for the table
@@ -56,9 +56,11 @@ export default class TableBlock {
   constructor({ data, config, api, readOnly }) {
     this.api = api;
     this.readOnly = readOnly;
+
     this.data = {
       withHeadings: data && data.withHeadings ? data.withHeadings : false,
-      content: data && data.content ? data.content : []
+      content: data && data.content ? data.content : [],
+      id: data.id,
     };
     this.config = config;
     this.table = null;
@@ -74,7 +76,7 @@ export default class TableBlock {
   static get toolbox() {
     return {
       icon: tableIcon,
-      title: 'Table'
+      title: "Table",
     };
   }
 
@@ -85,7 +87,20 @@ export default class TableBlock {
    */
   static get CSS() {
     return {
-      settingsWrapper: 'tc-settings'
+      settingsWrapper: "tc-settings",
+    };
+  }
+
+  /**
+   * Sanitizer rules
+   *
+   * @returns {object}
+   */
+  static get sanitize() {
+    return {
+      br: true,
+      span: true,
+      "obx-entity": true,
     };
   }
 
@@ -99,7 +114,7 @@ export default class TableBlock {
     this.table = new Table(this.readOnly, this.api, this.data, this.config);
 
     /** creating container around table */
-    this.container = $.make('div', this.api.styles.block);
+    this.container = $.make("div", this.api.styles.block);
     this.container.appendChild(this.table.getWrapper());
 
     this.table.setHeadingsSetting(this.data.withHeadings);
@@ -113,37 +128,42 @@ export default class TableBlock {
    * @returns {HTMLElement} - wrapper element
    */
   renderSettings() {
-    const wrapper = $.make('div', TableBlock.CSS.settingsWrapper);
+    const wrapper = $.make("div", TableBlock.CSS.settingsWrapper);
 
-    const tunes = [ {
-      name: this.api.i18n.t('With headings'),
-      icon: withHeadings,
-      isActive: this.data.withHeadings,
-      setTune: () => {
-        this.data.withHeadings = true;
-      }
-    }, {
-      name: this.api.i18n.t('Without headings'),
-      icon: withoutHeadings,
-      isActive: !this.data.withHeadings,
-      setTune: () => {
-        this.data.withHeadings = false;
-      }
-    } ];
+    const tunes = [
+      {
+        name: this.api.i18n.t("With headings"),
+        icon: withHeadings,
+        isActive: this.data.withHeadings,
+        setTune: () => {
+          this.data.withHeadings = true;
+        },
+      },
+      {
+        name: this.api.i18n.t("Without headings"),
+        icon: withoutHeadings,
+        isActive: !this.data.withHeadings,
+        setTune: () => {
+          this.data.withHeadings = false;
+        },
+      },
+    ];
 
     tunes.forEach((tune) => {
-      let tuneButton = $.make('div', this.api.styles.settingsButton);
+      let tuneButton = $.make("div", this.api.styles.settingsButton);
 
       if (tune.isActive) {
         tuneButton.classList.add(this.api.styles.settingsButtonActive);
       }
 
       tuneButton.innerHTML = tune.icon;
-      tuneButton.addEventListener('click', () => this.toggleTune(tune, tuneButton));
+      tuneButton.addEventListener("click", () =>
+        this.toggleTune(tune, tuneButton)
+      );
 
       this.api.tooltip.onHover(tuneButton, tune.name, {
-        placement: 'top',
-        hidingDelay: 500
+        placement: "top",
+        hidingDelay: 500,
       });
 
       wrapper.append(tuneButton);
@@ -161,8 +181,9 @@ export default class TableBlock {
     const tableContent = this.table.getData();
 
     let result = {
+      id: this.data.id,
       withHeadings: this.data.withHeadings,
-      content: tableContent
+      content: tableContent,
     };
 
     return result;
@@ -177,7 +198,9 @@ export default class TableBlock {
    * @returns {void}
    */
   toggleTune(tune, tuneButton) {
-    const buttons = tuneButton.parentNode.querySelectorAll('.' + this.api.styles.settingsButton);
+    const buttons = tuneButton.parentNode.querySelectorAll(
+      "." + this.api.styles.settingsButton
+    );
 
     // Clear other buttons
     Array.from(buttons).forEach((button) =>

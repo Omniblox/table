@@ -1,8 +1,8 @@
 {
-  "extends": [
-    "codex"
-  ],
+  "extends": ["codex"],
   "rules": {
-    "jsdoc/no-undefined-types": "off"
+    "jsdoc/no-undefined-types": "off",
+    "comma-dangle": ["error", "always"],
+    "quotes": ["error", "single"]
   }
 }
