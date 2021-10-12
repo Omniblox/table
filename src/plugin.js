@@ -101,6 +101,10 @@ export default class TableBlock {
       br: true,
       span: true,
       "obx-entity": true,
+      a: true,
+      i: true,
+      b: true,
+      mark: true,
     };
   }
 
